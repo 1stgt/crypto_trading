@@ -11,7 +11,7 @@ from crypto_data import get_coins_list, get_historical_data, get_dex_price
 from database_manager import init_db, log_trade, get_all_trades, get_wallet_balance, update_wallet_balance, get_open_positions, close_position
 from ai_brain import get_trading_signal
 from one_inch_wrapper import OneInchService
-from wallet_bridge import generate_trust_wallet_link
+# from wallet_bridge import generate_trust_wallet_link
 from trust_wallet_bridge import generate_buy_link
 
 st.markdown("""
@@ -445,3 +445,4 @@ with tab3:
         st.download_button("Export History (CSV)", csv, "trade_history.csv", "text/csv")
     else:
         st.info("No trade history found. Start trading in Tab 2 to build your portfolio.")
+
