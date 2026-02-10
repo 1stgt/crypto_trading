@@ -1,0 +1,60 @@
+# Gravity AI Trading Dashboard - Codebase Overview (v2.0)
+
+## 1. Project Architecture (High-Level)
+The application is a pro-grade Streamlit terminal featuring a "Binance Futures" style interface. It separates market analysis, execution, and portfolio tracking into a high-performance modular architecture.
+
+[app.py (UI & State)] 
+   |-- [crypto_data.py] -> CoinGecko (CEX) & 1inch (DEX) pricing.
+   |-- [ai_brain.py] -> Gemini AI Strategist with Local Technical Fallback.
+   |-- [database_manager.py] -> SQLite Storage (trades.db) for Wallet & Positions.
+   |-- [data_collector.py] -> Background daemon for high-frequency price history.
+   |-- [trust_wallet_bridge.py] -> Deep-link generation for Live DEX execution.
+
+---
+
+## 2. Terminal Features & Workflows
+
+### Tab 1: Market Overview
+- **Visuals**: Real-time Sentiment Heatmap (Red/Green) and single-pane high-resolution price charts.
+- **Data**: 24h market performance metrics with "LIVE" price markers.
+
+### Tab 2: AI Trading Bot (Execution Terminal)
+- **Always-On Engine**: Unified terminal for instant trading without waiting for AI.
+- **Leverage Module**: Simulation slider from 1x to 125x (saved independently per trade).
+- **Manual Overrides**: Direct BUY/SELL buttons that bypass AI recommendations.
+- **Strategy Overlay**: Gemini-powered market analysis (Flash Model) with an "AI Offline" fallback that uses local SQLite data for technical trend analysis when quotas are hit.
+
+### Tab 3: Analytics (The Portfolio)
+- **Binance Cards**: Independent position cards showing % Gain, $ Profit, Entry/Mark Price, and specific leverage used for that trade.
+- **Dual Wallets**: Hard separation between Virtual ($1,000 Resettable) and Live ($0.00 Placeholder) balances.
+- **Audit Trail**: Full trade history with mode-specific filtering and CSV export.
+
+---
+
+## 3. Database Schema (trades.db & crypto_bot.db)
+
+### Table: trade_history (In trades.db)
+- `coin`, `action`, `price`, `amount`, `leverage`: Core trade data.
+- `reasoning`: AI Insight or "Manual Entry" logs.
+- `mode`: Paper/Live.
+
+### Table: open_positions (In trades.db)
+- Tracks active trades. Each row stores its own `leverage` factor to ensure individual P&L calculate accuracy.
+
+### Table: price_history (In crypto_bot.db)
+- High-frequency data (1-min intervals) used by `ai_brain.py` for both Gemini analysis and Technical Fallback generation.
+
+---
+
+## 4. Key Logic & Modules
+
+- **Independent Leverage**: Calculated as `((Current - Entry) / Entry) * 100 * Leverage`. Stored in the DB at the moment of execution.
+- **Virtual Balance Reset**: One-click reset in the Analytics tab that wipes simulation data back to $1,000.
+- **1inch Integration**: Uses `trust_wallet_bridge.py` to generate intent-based URLs for Trust Wallet dApp browsers.
+
+## 5. Deployment Dependencies
+- `streamlit`: Core UI framework.
+- `google-genai`: Strategy generation.
+- `pandas/plotly`: Analytics and Charting.
+- `sqlite3`: Local persistent engine.
+- `python-dotenv`: Environment & Key management.
